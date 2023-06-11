@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "back-sushi"
+version = "0.1.0"
+description = ""
+authors = ["Afrozens <jesuszen2.6@gmail.com>"]
+readme = "README.md"
+packages = [{include = "back_sushi"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+uvicorn = "^0.22.0"
+fastapi = "^0.96.1"
+dependencies = "^7.7.0"
+sqlalchemy = "1.4.41"
+sqlmodel = "^0.0.8"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
