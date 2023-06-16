@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 
 from configs.database import get_db
 from models.sushiModel import Sushi
+from routers.sushiRouter import user_dependency
+
 
 class SushiRepository:
     db: Session
@@ -10,8 +12,13 @@ class SushiRepository:
     def __init__(self, db: Session = Depends(get_db)) -> None:
         self.db = db
 
-    def get(self, sushi: Sushi, id: int) -> Sushi:
-        return self.db.query(sushi).get(id)
+    def get(self, sushi: Sushi, id: int, user: user_dependency) -> Sushi:
+        return (
+            self.db.query(sushi)
+            .filter(sushi.id == id)
+            .filter(sushi.owner_id == user.get("id"))
+            .first()
+        )
 
     def create(self, sushi: Sushi) -> Sushi:
         self.db.add(sushi)
@@ -19,13 +26,22 @@ class SushiRepository:
         self.db.refresh(sushi)
         return sushi
 
-    def update(self, id: int, sushi: Sushi) -> Sushi:
+    def update(self, id: int, sushi: Sushi, user: user_dependency) -> Sushi:
         sushi.id = id
-        self.db.merge(sushi)
+        sushi_model = self.db.query(sushi.owner_id == user.get("id")).first()
+        self.db.merge(sushi_model)
         self.db.commit()
-        return sushi
+        return sushi_model
 
-    def delete(self, sushi: Sushi) -> None:
-        self.db.delete(sushi)
+    def delete(self, sushi: Sushi, id: int, user: user_dependency) -> None:
+        sushi_model = (
+            self.db.query(sushi)
+            .filter(sushi.id == id)
+            .filter(sushi.owner_id == user.get("id"))
+            .first()
+        )
+        if sushi_model is None:
+            False
+        self.db.delete(sushi_model)
         self.db.commit()
         self.db.flush()
