@@ -17,8 +17,8 @@ ALGORITHM = "HS256"
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/token")
 
-def authenticate_user(username: str, password: str, auth_repository):
-    user = auth_repository.get(Users, username)
+def authenticate_user(username: str, password: str, auth_repository: AuthRepository):
+    user = auth_repository.get(username)
     if not user:
         return False
     if not bcrypt_context.verify(password, user.hashed_password):
